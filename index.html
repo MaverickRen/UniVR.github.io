@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="UniVR: Thinking in Visual Space for Unified Visual Reasoning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UniVR: Thinking in Visual Space for Unified Visual Reasoning</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/univr_logo.svg">
+  <link rel="stylesheet" href="./static/css/float.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      "HTML-CSS": { styles: { '.MathJax_Display': { color: "#c5c6c7" }, '.MathJax': { color: "#c5c6c7" } } },
+      tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']] }
+    });
+  </script>
+
+  <style>
+    /* --- Base Cleanup --- */
+    body {
+      font-family: 'Google Sans', 'Noto Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: transparent;
+      color: #f0f0f0;
+      position: relative;
+    }
+
+    html {
+      background-color: #020205;
+      height: 100%;
+    }
+
+    /* Deep space gradient layer */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: radial-gradient(ellipse 100% 90% at 50% 15%, #2d2345 0%, #0a0810 50%, #000000 100%);
+      z-index: -2;
+    }
+
+    /* Dynamic grid layer */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 200%; height: 200%;
+      background:
+        linear-gradient(90deg, rgba(255, 107, 53, 0.04) 1px, transparent 1px),
+        linear-gradient(rgba(255, 107, 53, 0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      animation: grid-move 60s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @keyframes grid-move {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-40px, -40px); }
+    }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0b0c10; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #FF6B35; }
+
+    a {
+      color: #FF8C42;
+      transition: all 0.3s ease;
+    }
+    a:hover {
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Title font */
+    h1.title, h2.title, .title {
+      font-family: 'Exo 2', sans-serif !important;
+      letter-spacing: 0.02em;
+      color: #ffffff !important;
+      text-shadow: none;
+      position: relative;
+    }
+
+    .publication-title { text-shadow: none; }
+
+    h2.title {
+      display: inline-block;
+      padding-bottom: 12px;
+    }
+
+    h2.title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      background: #ffffff;
+      border-radius: 4px;
+      transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: none;
+    }
+
+    /* Override Georgia */
+    font[face="Georgia"] { font-family: 'Google Sans', sans-serif !important; }
+    [style*="font-family: 'Georgia'"] { font-family: 'Exo 2', sans-serif !important; }
+    .content [style*="font-family: 'Georgia'"],
+    .publication-authors [style*="font-family: 'Georgia'"] { font-family: 'Google Sans', sans-serif !important; }
+
+    h2.title:hover::after { width: 60%; }
+
+    /* Button glass morphism */
+    .button.is-dark {
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
+      color: #f0f0f0;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .button.is-dark:hover {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+      border-color: #FF6B35;
+      color: #ffffff;
+    }
+
+    /* Scroll reveal animation */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Highlight box - glass morphism */
+    .highlight-box {
+      background: rgba(30, 30, 45, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 5px solid #FF6B35;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
+    }
+    .highlight-box:hover {
+      background: rgba(40, 40, 60, 0.6);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer {
+      background-color: transparent;
+      color: #8b949e;
+      padding-bottom: 3rem;
+    }
+
+    /* Flame animation */
+    @keyframes flame-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1); }
+    }
+    .fire-icon {
+      display: inline-block;
+      animation: flame-pulse 2s infinite ease-in-out;
+    }
+
+    /* Logo style */
+    .project-logo {
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+      filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.4));
+      cursor: pointer;
+      animation: logo-intro 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s;
+    }
+
+    .main-title-text {
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+      cursor: default;
+      animation: title-intro 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;
+    }
+
+    .publication-title:hover .project-logo {
+      transform: scale(1.15) rotate(-3deg);
+      filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.3));
+    }
+    .publication-title:hover .main-title-text {
+      transform: scale(1.05) translateY(-2px);
+      filter: brightness(1.2);
+    }
+
+    @keyframes logo-intro {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.15) rotate(-3deg); filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.3)); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    @keyframes title-intro {
+      0% { transform: scale(1) translateY(0); }
+      50% { transform: scale(1.05) translateY(-2px); filter: brightness(1.2); }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    /* Section title effects */
+    h2.title .section-logo {
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+      filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.3));
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    h2.title .section-text {
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+      vertical-align: middle;
+    }
+    h2.title:hover .section-logo {
+      transform: scale(1.15) rotate(-3deg);
+      filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.3));
+    }
+    h2.title:hover .section-text {
+      transform: scale(1.05) translateY(-2px);
+      filter: brightness(1.2);
+    }
+
+    /* Subtitle animation */
+    .subtitle-text {
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.5s forwards;
+      transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
+      display: inline-block;
+    }
+    .subtitle-text:hover {
+      color: #ffffff !important;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      transform: scale(1.02);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* BibTeX styling */
+    #BibTeX pre {
+      background-color: rgba(20, 20, 30, 0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    #BibTeX code {
+      background-color: transparent;
+      color: #b0b0b0;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    /* Table styling for dark theme */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 15px;
+      font-family: 'Google Sans', sans-serif;
+    }
+    .results-table thead th {
+      background: rgba(255, 107, 53, 0.15);
+      color: #FF8C42;
+      padding: 12px 10px;
+      text-align: center;
+      border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+      font-weight: 600;
+    }
+    .results-table tbody td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #c5c6c7;
+    }
+    .results-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .results-table .highlight-row {
+      background: rgba(255, 107, 53, 0.08);
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .results-table .highlight-row td {
+      color: #ffffff;
+    }
+    .results-table .delta-row td {
+      color: #4CAF50;
+      font-weight: 600;
+      font-style: italic;
+    }
+    .results-table .section-header td {
+      background: rgba(255, 255, 255, 0.03);
+      color: #888;
+      font-style: italic;
+      text-align: left;
+      padding-left: 15px;
+    }
+
+    /* Accent color override */
+    .accent { color: #FF6B35; }
+    .accent-glow { color: #FF8C42; text-shadow: 0 0 8px rgba(255, 107, 53, 0.3); }
+  </style>
+</head>
+<body>
+
+<!-- Hero Title Section -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title" style="display: flex; flex-direction: column; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <img src="./static/images/univr_logo.svg" style="width: 60px; height: auto;" alt="Logo" class="project-logo"/>
+              <span class="main-title-text" style="font-family: 'Exo 2', sans-serif; font-weight: 700; color: #f0f0f0;">UniVR</span>
+            </div>
+            <span class="subtitle-text" style="font-family: 'Exo 2', sans-serif; font-size: 0.6em; color: #ffffff; font-weight: 400; letter-spacing: 0.5px;">Thinking in Visual Space for Unified Visual Reasoning</span>
+          </h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=e5TJm-0AAAAJ&hl=zh-CN"><font face="Georgia">Zhongwei Ren</font></a><sup>1,2</sup>,</span>
+            <span class="author-block">
+              <a href="https://weiyc.github.io/"><font face="Georgia">Yunchao Wei</font></a><sup>1<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&dagger;</mo></math></sup>,</span>
+            <span class="author-block">
+              <a href="#"><font face="Georgia">Xiao Yu</font></a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="#"><font face="Georgia">Guixun Luo</font></a><sup>1</sup>,</span>
+            <br>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=474TbQYAAAAJ&hl=zh-CN"><font face="Georgia">Yao Zhao</font></a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com.sg/citations?user=NmHgX-wAAAAJ&hl=en"><font face="Georgia">Bingyi Kang</font></a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="https://sites.google.com/site/jshfeng/home"><font face="Georgia">Jiashi Feng</font></a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com.sg/citations?user=OEZ816YAAAAJ&hl=en"><font face="Georgia">Xiaojie Jin</font></a><sup>2<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&dagger;</mo></math><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&Dagger;</mo></math></sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup><font face="Georgia">Beijing Jiaotong University,</font></span>
+            <span class="author-block"><sup>2</sup><font face="Georgia">ByteDance Seed</font></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">(<sup><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&dagger;</mo></math></sup><font face="Georgia">Correspondence,</font><sup><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&Dagger;</mo></math></sup><font face="Georgia">Project Lead)</font></span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="#"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/MaverickRen/UniVR.github.io"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Teaser Figure -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+    <div class="column is-full">
+    <div class="hero-body">
+      <img src="./static/images/page2_fig1.png"
+                class="interpolation-image"
+                alt="UniVR teaser figure"/>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+          <div class="content has-text-justified">
+            <p style="font-size: 16px;">
+              <font face="Georgia">Figure 1: UniVR focuses on advancing native visual-space reasoning and planning across diverse tasks. Compared to LMMs that reason within textual space, UniVR facilitates a more profound comprehension of the real visual world, improving policy learning in various scenarios.</font>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- Abstract -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="6%"/>
+          <span class="section-text" style="font-family: 'Georgia', serif;">Abstract</span>
+        </h2>
+        <div class="content has-text-justified">
+          <p style="font-size: 20px;">
+            <font face="Georgia">Learning broad world knowledge directly from raw visual data is a fundamental capability of intelligence. We introduce <b>UniVR</b>, the first investigation into simultaneously learning complex reasoning, fine-grained physical dynamics, and long-term planning from pure visual demonstrations. At its core, UniVR features <b>VR-GRPO</b>, a reinforcement learning paradigm with complementary global and step-level rewards. This approach enforces logical coherence and physical consistency throughout the reasoning process without requiring task-specific heuristics or image-text pairs. To train and evaluate UniVR, we construct <b>VR-X</b>, a large-scale benchmark curated from 16 diverse sources spanning long-horizon manipulation, spatial puzzles, and physical reasoning. It is the first comprehensive suite to assess these heterogeneous capabilities under a purely visual protocol. Remarkably, UniVR achieves up to a <b>25% improvement</b> on VR-X, and its superior visual reasoning also boosts performance on various multimodal understanding benchmarks. These findings underscore the vast potential of reasoning within visual spaces, with all code, data, and models to be open-sourced for further research.</font>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Highlights -->
+<section class="hero is-big" style="margin-top: 35px; padding-bottom: 35px;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <br>
+        <h2 class="title is-3"><span class="fire-icon">🔥</span><span class="section-text" style="font-family: 'Georgia', serif;">Highlights</span></h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full" style="font-family: 'Georgia', serif;">
+
+          <div class="highlight-box">
+            <p style="font-size: 20px; margin-bottom: 0;">
+              1. <b>We are the first to explore</b> <span style="color: #FF8C42">learning heterogeneous tasks&mdash;from long-term planning to general cognitive reasoning&mdash;directly in a unified visual space without language supervision.</span>
+            </p>
+          </div>
+
+          <div class="highlight-box">
+            <p style="font-size: 20px; margin-bottom: 0;">
+              2. <b>We propose VR-GRPO</b>, <span style="color: #FF8C42">a novel RL paradigm featuring Step-Focal rewards that proactively target error-prone reasoning substeps alongside global rewards,</span> significantly improving logical coherence and physical consistency without relying on image-text pairs or task-specific rules.
+            </p>
+          </div>
+
+          <div class="highlight-box">
+            <p style="font-size: 20px; margin-bottom: 0;">
+              3. <b>We introduce VR-X</b>, a large-scale benchmark for evaluating diverse tasks in visual space, spanning from fine-grained long-term planning to general reasoning across <b>16 diverse sources</b> and <b>1.5M raw samples</b>, to facilitate future research on visual reasoning.
+            </p>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Background & Motivation -->
+<section class="section">
+  <div class="container is-max-desktop" style="font-family: 'Georgia', serif;">
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">Background</span>
+        </h2>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <p style="font-size: 20px;">
+            Current AI models primarily derive world knowledge from text, performing reasoning and planning within the textual space. However, text is an abstract representation of the world, unable to fully encompass the rich information of the real visual world, such as complex dynamics, spatial relationships, and underlying physical laws. In contrast, vision serves as the most direct medium for world knowledge and remains the primary source for animals and humans to acquire information. Humans can perform complex reasoning without relying on language by directly simulating task execution and scene transitions in their minds&mdash;this constitutes our innate visual reasoning capability.
+          </p>
+          <p style="font-size: 20px;">
+            Recent approaches, such as MLLMs paired with generative models, conveniently leverage pre-existing linguistic strengths, but textual abstractions inherently struggle to capture intricate dynamics and spatial relationships. Their reasoning still remains heavily dependent on text guidance, requiring dense image-text pairs for both training and inference. These limitations drive our core inquiry:
+            <b><i>How can models utilize raw visual data to boost their visual reasoning capabilities across diverse tasks?</i></b>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <!-- Architecture Overview -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">Architecture Overview</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <img src="./static/images/fig2_architecture.png"
+                class="interpolation-image"
+                alt="UniVR architecture overview"/>
+          <figcaption style="font-size: 16px; margin-top: 10px;">Figure 2: Overview of UniVR architecture. Via a unified next-token prediction objective, UniVR processes instructions and image queries to directly generate visual reasoning traces for task execution.</figcaption>
+          <br>
+          <p style="font-size: 20px;">
+            Given an image sequence and an instruction, UniVR models the next-frame distribution using image sequences containing demonstration trajectories across diverse scenarios. Our formulation does not require dense textual reasoning chains, but instead directly models the state transitions and underlying policy dynamics in these trajectories, encouraging the model to <b>reason in visual space</b>. We adopt Emu3.5 as our baseline, a state-of-the-art unified generative model that produces variable-length image sequences using a VQ-VAE-style autoencoder.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <!-- VR-GRPO -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">VR-GRPO: Visual Reasoning GRPO</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <img src="./static/images/fig3_vrgrpo.png"
+                class="interpolation-image"
+                alt="VR-GRPO diagram"/>
+          <figcaption style="font-size: 16px; margin-top: 10px;">Figure 3: The proposed Visual Reasoning GRPO. VR-GRPO integrates global and step-focal rewards to ensure both task completion and the physical coherence of generated reasoning traces. The step-focal reward identifies the most error-prone steps via inter-trajectory variance analysis.</figcaption>
+          <br>
+          <p style="font-size: 20px;">
+            While RL methods like GRPO offer a promising paradigm for performance enhancement, existing methods prioritize visual fidelity over reasoning correctness. We propose <b>VR-GRPO</b>, which integrates two complementary reward signals:
+          </p>
+          <p style="font-size: 20px;">
+            <b>Global Reward (R<sub>g</sub>)</b>: A VLM evaluator provides holistic assessment of generated sequences for task completion and visual quality.
+          </p>
+          <p style="font-size: 20px;">
+            <b>Step-Focal Reward (R<sub>s</sub>)</b>: We introduce a step-focal reward designed to identify the most error-prone steps in the reasoning trajectory. By extracting per-frame CLIP embeddings and calculating inter-trajectory variance, we locate the timestep of maximum uncertainty where the model's reasoning paths diverge, then focus the VLM on these critical steps for fine-grained evaluation.
+          </p>
+          <p style="font-size: 20px;">
+            The final reward combines both: <b>R<sub>reason</sub> = R<sub>g</sub> &minus; &lambda;|R<sub>g</sub> &minus; R<sub>s</sub>|</b>, preventing the model from taking reasoning shortcuts while maintaining procedural integrity and physical coherence.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <!-- VR-X Benchmark -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">VR-X Benchmark</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <img src="./static/images/page6_fig1.png"
+                class="interpolation-image"
+                alt="VR-X benchmark overview"/>
+          <figcaption style="font-size: 16px; margin-top: 10px;">Figure 4: Overview of VR-X benchmark. It includes six task categories providing detailed visual reasoning traces: visual guidance, robotic manipulation, puzzle games, editing, visual search, and spatial perception.</figcaption>
+          <br>
+          <p style="font-size: 20px;">
+            We introduce <b>VR-X</b>, the first large-scale benchmark designed for diverse and heterogeneous visual reasoning. VR-X is curated from <b>1.5M raw samples</b> across <b>16 diverse sources</b> (e.g., AgiBot, Action100M, EgoDex, VisualCoT), spanning minute-long planning (robotic manipulation, cooking, handcrafting) to single-step reasoning (mazes, visual search). After rigorous curation, the benchmark contains <b>310k cold-start training</b>, <b>3k RL</b>, and <b>1.8k evaluation</b> samples, all in a unified format: query image, textual instruction, visual reasoning trajectory.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Results -->
+<section class="section">
+  <div class="container is-max-desktop" style="font-family: 'Georgia', serif;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">Main Results</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <p style="font-size: 20px; text-align: center; margin-bottom: 10px;"><b>Comparison on VR-X Benchmark</b></p>
+          <p style="font-size: 16px; text-align: center; color: #888; margin-bottom: 20px;">Qwen, Gemini 2.5/3, and GPT-5 are paired with Qwen-image-edit, Nano Banana 1/2, and GPT-image-1.5, respectively.</p>
+          <div style="overflow-x: auto;">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Visual Thinking</th>
+                <th>Guidance</th>
+                <th>Robot</th>
+                <th>Editing</th>
+                <th>Spatial</th>
+                <th>Puzzle</th>
+                <th>Search</th>
+                <th>Overall&uarr;</th>
+                <th>JEPA&darr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="section-header"><td colspan="10">Large Multimodal Model + T2I Model</td></tr>
+              <tr><td style="text-align:left">Qwen3-VL-235B</td><td>&cross;</td><td>48.2</td><td>62.8</td><td>42.1</td><td>38.2</td><td>64.1</td><td>59.8</td><td>52.5</td><td>18.08</td></tr>
+              <tr><td style="text-align:left">Qwen3.5-397B</td><td>&cross;</td><td>47.0</td><td>63.2</td><td>39.8</td><td>40.4</td><td>65.6</td><td>64.5</td><td>53.4</td><td>18.64</td></tr>
+              <tr><td style="text-align:left">GPT-5</td><td>&cross;</td><td>68.2</td><td>64.1</td><td>58.0</td><td>49.3</td><td>64.0</td><td>77.4</td><td>63.5</td><td>12.17</td></tr>
+              <tr><td style="text-align:left">Gemini-2.5-pro</td><td>&cross;</td><td>58.4</td><td>67.9</td><td>54.0</td><td>40.5</td><td>67.7</td><td>76.3</td><td>60.8</td><td>14.39</td></tr>
+              <tr><td style="text-align:left">Gemini-3-pro</td><td>&cross;</td><td>66.2</td><td>67.1</td><td>63.7</td><td>55.1</td><td>65.5</td><td>79.0</td><td>66.1</td><td>11.07</td></tr>
+              <tr class="section-header"><td colspan="10">Unified Generation Model</td></tr>
+              <tr><td style="text-align:left">Janus-pro</td><td>&cross;</td><td>9.2</td><td>18.2</td><td>5.4</td><td>10.2</td><td>27.1</td><td>21.5</td><td>15.3</td><td>68.79</td></tr>
+              <tr><td style="text-align:left">Show-o2</td><td>&cross;</td><td>15.1</td><td>22.5</td><td>13.0</td><td>17.1</td><td>29.4</td><td>35.8</td><td>22.2</td><td>59.93</td></tr>
+              <tr><td style="text-align:left">Bagel</td><td>&cross;</td><td>25.2</td><td>34.7</td><td>20.9</td><td>21.3</td><td>35.1</td><td>47.7</td><td>30.8</td><td>40.88</td></tr>
+              <tr><td style="text-align:left">OmniGen2</td><td>&cross;</td><td>20.4</td><td>29.4</td><td>15.2</td><td>16.9</td><td>30.5</td><td>42.1</td><td>25.8</td><td>47.09</td></tr>
+              <tr><td style="text-align:left">Emu3.5</td><td>&cross;</td><td>38.6</td><td>42.8</td><td>32.7</td><td>35.3</td><td>43.4</td><td>46.2</td><td>39.8</td><td>33.62</td></tr>
+              <tr class="highlight-row"><td style="text-align:left"><b>UniVR</b></td><td>&check;</td><td><b>59.5</b></td><td><b>68.0</b></td><td><b>48.5</b></td><td><b>46.5</b></td><td><b>62.2</b></td><td><b>64.3</b></td><td><b>58.2</b></td><td><b>13.01</b></td></tr>
+              <tr class="delta-row"><td style="text-align:left">&Delta; v.s. Emu3.5</td><td></td><td>&uarr;20.9</td><td>&uarr;25.2</td><td>&uarr;15.8</td><td>&uarr;11.2</td><td>&uarr;18.8</td><td>&uarr;18.1</td><td>&uarr;18.4</td><td>&darr;20.61</td></tr>
+            </tbody>
+          </table>
+          </div>
+
+          <br>
+          <p style="font-size: 20px;">
+            UniVR significantly boosts visual reasoning capabilities without compromising the foundational strengths of the base model (Emu3.5). With only <b>34B parameters</b>, UniVR approaches the performance of the Gemini 3 Pro + Nano Banana 2 pipeline and even <b>surpasses Gemini 3 in long-horizon manipulation tasks</b>. Among unified generation models, UniVR achieves a remarkable <b>+18.4 overall improvement</b> over Emu3.5.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Multimodal Understanding Results -->
+<section class="section">
+  <div class="container is-max-desktop" style="font-family: 'Georgia', serif;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">Enhanced Multimodal Understanding</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <p style="font-size: 20px; text-align: center; margin-bottom: 20px;"><b>Results on Multimodal Understanding Benchmarks</b></p>
+          <div style="overflow-x: auto;">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>MMMU</th>
+                <th>MME(P)</th>
+                <th>MME(C)</th>
+                <th>MMBench</th>
+                <th>MathVista</th>
+                <th>MM-Vet</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="text-align:left">Emu 3.5</td><td>0.292</td><td>781.1</td><td>324.6</td><td>0.183</td><td>41.7</td><td>28.0</td></tr>
+              <tr><td style="text-align:left">Text-only training</td><td>0.290</td><td>782.0</td><td>323.4</td><td>0.199</td><td>40.8</td><td>28.3</td></tr>
+              <tr class="highlight-row"><td style="text-align:left"><b>UniVR</b></td><td><b>0.337</b></td><td><b>799.3</b></td><td><b>338.5</b></td><td><b>0.198</b></td><td><b>44.0</b></td><td><b>35.6</b></td></tr>
+              <tr class="delta-row"><td style="text-align:left">&Delta; v.s. Emu3.5</td><td>&uarr;0.045</td><td>&uarr;18.2</td><td>&uarr;13.9</td><td>&uarr;0.015</td><td>&uarr;2.3</td><td>&uarr;7.6</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <br>
+          <p style="font-size: 20px;">
+            Enhanced visual reasoning serves as a powerful complement to textual supervision, effectively <b>bolstering overall multimodal comprehension</b>. Training solely on textual reasoning chains yields negligible gains, while UniVR's visual reasoning paradigm leads to significant improvements across all six benchmarks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- More Visualizations -->
+<section class="section">
+  <div class="container is-max-desktop" style="font-family: 'Georgia', serif;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">
+          <img src="./static/images/univr_logo.svg" class="section-logo" alt="Logo" width="5%"/>
+          <span class="section-text">Visualizations</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content has-text-justified">
+          <img src="./static/images/fig_more_vis.png"
+                class="interpolation-image"
+                alt="More visualization results"/>
+          <figcaption style="font-size: 16px; margin-top: 10px;">UniVR generates long-horizon sequences with coherent logic, physical dynamics, and temporal consistency across diverse scenarios including hanging clothes, cooking, baking, folding, tying, drawing, building, and stir-frying.</figcaption>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- BibTeX -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content" style="font-family: 'Georgia', serif;">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{ren2026univr,
+  title={UniVR: Thinking in Visual Space for Unified Visual Reasoning},
+  author={Zhongwei Ren and Yunchao Wei and Xiao Yu and Guixun Luo and Yao Zhao and Bingyi Kang and Jiashi Feng and Xiaojie Jin},
+  year={2026},
+}
+</code></pre>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="#">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/MaverickRen/UniVR.github.io" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is adapted from <a
+            href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>, licensed under a <a rel="license"
+            href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+$(document).ready(function() {
+    // Scroll reveal animation
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    $('section').each(function() {
+      $(this).addClass('scroll-reveal');
+      observer.observe(this);
+    });
+
+    $('.highlight-box').each(function(index) {
+      $(this).addClass('scroll-reveal');
+      $(this).css('transition-delay', (index * 0.1) + 's');
+      observer.observe(this);
+    });
+});
+</script>
+
+</body>
+</html>
